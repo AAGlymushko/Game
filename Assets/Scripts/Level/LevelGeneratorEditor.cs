@@ -1,14 +1,14 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(LevelGenerator))]
+[CustomEditor(typeof(Level))]
 public class MyBehaviourEditor : Editor
 {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
 
-        LevelGenerator myTarget = (LevelGenerator)target;
+        Level myTarget = (Level)target;
 
         if (GUILayout.Button("Сгенерировать"))
         {

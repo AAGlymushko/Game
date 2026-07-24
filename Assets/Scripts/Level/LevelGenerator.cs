@@ -2,41 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour
-{
-    const int LENGTH = 21;
-    const int REFERENCE_POINTS_COUNT = 17;
-    const int INTERSECTIONS_COUNT = 123;
-
-    private const float CELL_SIZE = 1f;
-    private const float WALL_THICKNESS = 0.2f;
-    private const float WALL_HEIGHT = 2f;
-    private const float WALL_LENGTH = CELL_SIZE + WALL_THICKNESS;
-    private const float HALF_CELL = CELL_SIZE / 2f;
-    private const float HALF_HEIGHT = WALL_HEIGHT / 2f;
-
-    System.Random random = new System.Random();
-    List<GameObject> objects = new List<GameObject>();
-
-    private class Cell
-    {
-        public bool isVisited;
-        public int x;
-        public int z;
-        public bool up;
-        public bool down;
-        public bool left;
-        public bool right;
-
-        public Cell(bool isVisited, int x, int z)
-        {
-            this.isVisited = isVisited;
-            this.x = x;
-            this.z = z;
-            up = down = left = right = true;
-        }
-    }
-
-    public void generate()
+{  
+    public void generate(LevelRandom levelRandom, List<GameObject> objects)
     {
         List<Cell> getNeighbors(Cell[][] field, Cell cell)
         {
@@ -45,8 +12,8 @@ public class LevelGenerator : MonoBehaviour
             if (cell.x > 0 && !field[cell.x - 1][cell.z].isVisited) list.Add(field[cell.x - 1][cell.z]);
             if (cell.z > 0 && !field[cell.x][cell.z - 1].isVisited) list.Add(field[cell.x][cell.z - 1]);
 
-            if (cell.x < LENGTH - 1 && !field[cell.x + 1][cell.z].isVisited) list.Add(field[cell.x + 1][cell.z]);
-            if (cell.z < LENGTH - 1 && !field[cell.x][cell.z + 1].isVisited) list.Add(field[cell.x][cell.z + 1]);
+            if (cell.x < Constants.LENGTH - 1 && !field[cell.x + 1][cell.z].isVisited) list.Add(field[cell.x + 1][cell.z]);
+            if (cell.z < Constants.LENGTH - 1 && !field[cell.x][cell.z + 1].isVisited) list.Add(field[cell.x][cell.z + 1]);
 
             return list;
         }
@@ -73,23 +40,23 @@ public class LevelGenerator : MonoBehaviour
 
         List<Cell> randomPoints(Cell[][] field, int count)
         {
-            (int, int)[,] arr = new (int, int)[LENGTH, LENGTH];
+            (int, int)[,] arr = new (int, int)[Constants.LENGTH, Constants.LENGTH];
 
-            for (int i = 0; i < LENGTH; ++i)
+            for (int i = 0; i < Constants.LENGTH; ++i)
             {
-                for (int j = 0; j < LENGTH; ++j)
+                for (int j = 0; j < Constants.LENGTH; ++j)
                 {
                     arr[i, j].Item1 = i;
                     arr[i, j].Item2 = j;
                 }
             }
 
-            for (int i = 0; i < LENGTH; ++i)
+            for (int i = 0; i < Constants.LENGTH; ++i)
             {
-                for (int j = 0; j < LENGTH; ++j)
+                for (int j = 0; j < Constants.LENGTH; ++j)
                 {
-                    int other_i = random.Next(0, LENGTH);
-                    int other_j = random.Next(0, LENGTH);
+                    int other_i = levelRandom.Next(0, Constants.LENGTH);
+                    int other_j = levelRandom.Next(0, Constants.LENGTH);
 
                     (int, int) temp = arr[i, j];
                     arr[i, j] = arr[other_i, other_j];
@@ -104,7 +71,7 @@ public class LevelGenerator : MonoBehaviour
                 reference_points.Add(field[it.Item1][it.Item2]);
             }
 
-            reference_points.RemoveRange(count, LENGTH * LENGTH - count);
+            reference_points.RemoveRange(count, Constants.LENGTH * Constants.LENGTH - count);
 
             return reference_points;
         }
@@ -129,7 +96,7 @@ public class LevelGenerator : MonoBehaviour
 
                 if (next == null)
                 {
-                    next = neighborsList[random.Next(0, neighborsList.Count)];
+                    next = neighborsList[levelRandom.Next(0, neighborsList.Count)];
                 }
 
                 removeWall(current, next);
@@ -149,54 +116,54 @@ public class LevelGenerator : MonoBehaviour
 
         void buildWalls(Cell[][] field)
         {
-            for (int x = 0; x < LENGTH; x++)
+            for (int x = 0; x < Constants.LENGTH; x++)
             {
-                for (int z = 0; z < LENGTH; z++)
+                for (int z = 0; z < Constants.LENGTH; z++)
                 {
                     Cell cell = field[x][z];
 
                     if (cell.up && x > 0)
                     {
                         createWall(
-                            new Vector3(x - HALF_CELL, HALF_HEIGHT, z),
-                            new Vector3(WALL_THICKNESS, WALL_HEIGHT, WALL_LENGTH)
+                            new Vector3(x - Constants.HALF_CELL, Constants.HALF_HEIGHT, z),
+                            new Vector3(Constants.WALL_THICKNESS, Constants.WALL_HEIGHT, Constants.WALL_LENGTH)
                         );
                     }
 
                     if (cell.left && z > 0)
                     {
                         createWall(
-                            new Vector3(x, HALF_HEIGHT, z - HALF_CELL),
-                            new Vector3(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS)
+                            new Vector3(x, Constants.HALF_HEIGHT, z - Constants.HALF_CELL),
+                            new Vector3(Constants.WALL_LENGTH, Constants.WALL_HEIGHT, Constants.WALL_THICKNESS)
                         );
                     }
 
                     if (x == 0)
                     {
                         createWall(
-                            new Vector3(-HALF_CELL, HALF_HEIGHT, z),
-                            new Vector3(WALL_THICKNESS, WALL_HEIGHT, WALL_LENGTH)
+                            new Vector3(-Constants.HALF_CELL, Constants.HALF_HEIGHT, z),
+                            new Vector3(Constants.WALL_THICKNESS, Constants.WALL_HEIGHT, Constants.WALL_LENGTH)
                         );
                     }
-                    else if (x == LENGTH - 1)
+                    else if (x == Constants.LENGTH - 1)
                     {
                         createWall(
-                            new Vector3(LENGTH - HALF_CELL, HALF_HEIGHT, z),
-                            new Vector3(WALL_THICKNESS, WALL_HEIGHT, WALL_LENGTH)
+                            new Vector3(Constants.LENGTH - Constants.HALF_CELL, Constants.HALF_HEIGHT, z),
+                            new Vector3(Constants.WALL_THICKNESS, Constants.WALL_HEIGHT, Constants.WALL_LENGTH)
                         );
                     }
                     if (z == 0)
                     {
                         createWall(
-                            new Vector3(x, HALF_HEIGHT, -HALF_CELL),
-                            new Vector3(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS)
+                            new Vector3(x, Constants.HALF_HEIGHT, -Constants.HALF_CELL),
+                            new Vector3(Constants.WALL_LENGTH, Constants.WALL_HEIGHT, Constants.WALL_THICKNESS)
                         );
                     }
-                    else if (z == LENGTH - 1)
+                    else if (z == Constants.LENGTH - 1)
                     {
                         createWall(
-                            new Vector3(x, HALF_HEIGHT, LENGTH - HALF_CELL),
-                            new Vector3(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS)
+                            new Vector3(x, Constants.HALF_HEIGHT, Constants.LENGTH - Constants.HALF_CELL),
+                            new Vector3(Constants.WALL_LENGTH, Constants.WALL_HEIGHT, Constants.WALL_THICKNESS)
                         );
                     }
                 }
@@ -216,12 +183,12 @@ public class LevelGenerator : MonoBehaviour
         }
         objects.Clear();
 
-        Cell[][] field = new Cell[LENGTH][];
-        for (int i = 0; i < LENGTH; ++i)
+        Cell[][] field = new Cell[Constants.LENGTH][];
+        for (int i = 0; i < Constants.LENGTH; ++i)
         {
-            field[i] = new Cell[LENGTH];
+            field[i] = new Cell[Constants.LENGTH];
 
-            for (int j = 0; j < LENGTH; ++j)
+            for (int j = 0; j < Constants.LENGTH; ++j)
             {
                 field[i][j] = new Cell(false, i, j);
             }
@@ -229,11 +196,11 @@ public class LevelGenerator : MonoBehaviour
 
         Cell start = field[0][0];
 
-        createPath(field, start, randomPoints(field, REFERENCE_POINTS_COUNT));
+        createPath(field, start, randomPoints(field, Constants.REFERENCE_POINTS_COUNT));
 
-        foreach (Cell cell in randomPoints(field, INTERSECTIONS_COUNT))
+        foreach (Cell cell in randomPoints(field, Constants.INTERSECTIONS_COUNT))
         {
-            if (cell.x == 0 || cell.x == LENGTH - 1 || cell.z == 0 || cell.z == LENGTH - 1)
+            if (cell.x == 0 || cell.x == Constants.LENGTH - 1 || cell.z == 0 || cell.z == Constants.LENGTH - 1)
             {
                 continue;
             }
