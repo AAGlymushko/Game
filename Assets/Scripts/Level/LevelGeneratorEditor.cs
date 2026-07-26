@@ -14,5 +14,9 @@ public class MyBehaviourEditor : Editor
         {
             myTarget.generate();
         }
+        if (GUILayout.Button("Очистить"))
+        {
+            myTarget.clear();
+        }
     }
 }

@@ -18,23 +18,24 @@ public class LevelGenerator : MonoBehaviour
             return list;
         }
 
+
         void removeWall(Cell first, Cell second)
         {
             if (first.x == second.x - 1)
             {
-                second.up = false;
+                first.down = second.up = false;
             }
             else if (first.x == second.x + 1)
             {
-                first.up = false;
+                second.down = first.up = false;
             }
             else if (first.z == second.z - 1)
             {
-                second.left = false;
+                first.right = second.left = false;
             }
             else if (first.z == second.z + 1)
             {
-                first.left = false;
+                second.right = first.left = false;
             }
         }
 
@@ -116,6 +117,13 @@ public class LevelGenerator : MonoBehaviour
 
         void buildWalls(Cell[][] field)
         {
+            float center = (Constants.LENGTH / 2);
+            float length = ((Constants.LENGTH) / 10f);
+            GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            floor.transform.position = new Vector3(center, 0, center);
+            floor.transform.localScale = new Vector3(length, 0, length);
+            objects.Add(floor);
+
             for (int x = 0; x < Constants.LENGTH; x++)
             {
                 for (int z = 0; z < Constants.LENGTH; z++)
@@ -170,18 +178,23 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
-        foreach (var obj in objects)
+        void clear(List<GameObject> objects)
         {
-            if (Application.isPlaying)
+            foreach (GameObject obj in objects)
             {
-                Destroy(obj);
+                if (Application.isPlaying)
+                {
+                    Destroy(obj);
+                }
+                else
+                {
+                    DestroyImmediate(obj);
+                }
             }
-            else
-            {
-                DestroyImmediate(obj);
-            }
+            objects.Clear();
         }
-        objects.Clear();
+
+        clear(objects);
 
         Cell[][] field = new Cell[Constants.LENGTH][];
         for (int i = 0; i < Constants.LENGTH; ++i)
